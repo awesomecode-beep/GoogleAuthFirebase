@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Auth App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 h-screen flex justify-center items-center">
+
+    <div class="bg-white p-8 rounded-md shadow-md w-96" >
+        <button id="signInButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mb-4">
+            Create Account / Sign In
+        </button>
+        <button id="signOutButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full mb-4">
+            Sign Out
+        </button>
+
+        <div id="message" class="text-center">
+            <p class="text-gray-700">
+                You have signed in as <span id="userName" class="font-bold"></span>
+                with the email <span id="userEmail" class="font-bold"></span>
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+  
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFiJ1FLesQxWWJlolZb_stxiu1FKTuzf8",
+            authDomain: "auth1-b43f8.firebaseapp.com",
+            projectId: "auth1-b43f8",
+            storageBucket: "auth1-b43f8.appspot.com",
+            messagingSenderId: "278245992592",
+            appId: "1:278245992592:web:3e3e6c0dfc8d866af1d015"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+
+        const signInButton = document.getElementById("signInButton");
+        const signOutButton = document.getElementById("signOutButton");
+        const message = document.getElementById("message");
+        const userName = document.getElementById("userName");
+        const userEmail = document.getElementById("userEmail");
+
+        signOutButton.style.display = "none";
+        message.style.display = "none";
+
+        const userSignIn = async () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    console.log(user);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error(errorCode, errorMessage);
+                });
+        };
+
+        const userSignOut = async () => {
+            signOut(auth)
+                .then(() => {
+                    alert("You have signed out successfully!");
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                signOutButton.style.display = "block";
+                message.style.display = "block";
+                userName.innerHTML = user.displayName;
+                userEmail.innerHTML = user.email;
+            } else {
+                signOutButton.style.display = "none";
+                message.style.display = "none";
+            }
+        });
+
+        signInButton.addEventListener('click', userSignIn);
+        signOutButton.addEventListener('click', userSignOut);
+    </script>
+</body>
+</html>
